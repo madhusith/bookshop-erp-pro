@@ -1,0 +1,49 @@
+{
+  "name": "bookshop-erp",
+  "version": "1.0.0",
+  "description": "TN Book Store ERP System",
+  "main": "main.js",
+  "author": "TN Book Store",
+  "license": "ISC",
+  "scripts": {
+    "dev": "electron .",
+    "build": "electron-builder build --mac",
+    "build-win": "electron-builder build --win"
+  },
+  "dependencies": {
+    "wait-on": "^8.0.3"
+  },
+  "build": {
+    "appId": "com.tnbookstore.erp",
+    "productName": "TN Book Store ERP",
+    "directories": {
+      "buildResources": ".",
+      "output": "../dist"
+    },
+ "extraResources": [
+  {
+    "from": "../frontend/dist",
+    "to": "frontend/dist"
+  },
+  {
+    "from": "../backend",
+    "to": "backend"
+  }
+],
+    "files": [
+      "main.js",
+      "node_modules/**/*"
+    ],
+    "win": {
+      "target": "nsis"
+    },
+    "mac": {
+      "target": "dmg"
+    }
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.2",
+    "electron": "^34.3.0",
+    "electron-builder": "^25.1.8"
+  }
+}
