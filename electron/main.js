@@ -1,5 +1,5 @@
 const { app, BrowserWindow, shell } = require('electron');
-const { fork } = require('child_process');
+const { spawn } = require('child_process');
 const path = require('path');
 const waitOn = require('wait-on');
 
@@ -11,12 +11,15 @@ function startBackend() {
     ? path.join(process.resourcesPath, 'backend/server.js')
     : path.join(__dirname, '../backend/server.js');
 
+  // Use Electron's own Node.js executable
+  const nodeExec = process.execPath;
+
+  console.log('Node path:', nodeExec);
   console.log('Backend path:', backendPath);
 
-  // Use fork instead of spawn — uses Electron's bundled Node.js
-  backendProcess = fork(backendPath, [], {
-    silent: true,
-    env: { ...process.env, PORT: '5050' }
+  backendProcess = spawn(nodeExec, [backendPath], {
+    stdio: 'pipe',
+    env: { ...process.env, PORT: '5050', ELECTRON_RUN_AS_NODE: '1' }
   });
 
   backendProcess.stdout.on('data', (data) => console.log(`Backend: ${data}`));
