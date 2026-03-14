@@ -1,36 +1,21 @@
 const { app, BrowserWindow, shell } = require('electron');
-const { spawn } = require('child_process');
+const { fork } = require('child_process');
 const path = require('path');
 const waitOn = require('wait-on');
 
 let mainWindow;
 let backendProcess;
 
-function getNodePath() {
-  const possiblePaths = [
-    '/usr/local/bin/node',
-    '/usr/bin/node',
-    '/opt/homebrew/bin/node',
-    '/opt/local/bin/node',
-  ];
-  const fs = require('fs');
-  for (const p of possiblePaths) {
-    try { if (fs.existsSync(p)) return p; } catch (e) {}
-  }
-  return 'node';
-}
-
 function startBackend() {
   const backendPath = app.isPackaged
     ? path.join(process.resourcesPath, 'backend/server.js')
     : path.join(__dirname, '../backend/server.js');
 
-  const nodePath = getNodePath();
-  console.log('Using node:', nodePath);
   console.log('Backend path:', backendPath);
 
-  backendProcess = spawn(nodePath, [backendPath], {
-    stdio: 'pipe',
+  // Use fork instead of spawn — uses Electron's bundled Node.js
+  backendProcess = fork(backendPath, [], {
+    silent: true,
     env: { ...process.env, PORT: '5050' }
   });
 
@@ -58,8 +43,6 @@ function createWindow() {
     shell.openExternal(url);
     return { action: 'deny' };
   });
-
-  mainWindow.webContents.openDevTools();
 
   const frontendPath = app.isPackaged
     ? path.join(process.resourcesPath, 'frontend/dist/index.html')
